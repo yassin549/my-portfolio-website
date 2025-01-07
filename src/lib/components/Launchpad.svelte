@@ -1,90 +1,97 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { fade, scale } from 'svelte/transition';
-  import photos from '$lib/assets/icons/photos.avif'; 
-  import terminal from '$lib/assets/icons/terminal.avif';
-  import safari from '$lib/assets/icons/safari.png';
-  import projects from '$lib/assets/icons/projects.png';
-  import blog from '$lib/assets/icons/blog.png';
-  import github from '$lib/assets/icons/github.png';
-  import clave from '$lib/assets/icons/clave.png';
-  
+  import { quintOut } from 'svelte/easing';
+  import terminalIcon from '$lib/assets/icons/terminal.avif';
+  import safariIcon from '$lib/assets/icons/safari.png';
+  import photosIcon from '$lib/assets/icons/photos.avif';
+  import projectsIcon from '$lib/assets/icons/projects.png';
+  import githubIcon from '$lib/assets/icons/github.png';
+
   export let isOpen: boolean;
   const dispatch = createEventDispatcher();
 
-  let searchText = '';
-  let searchFocused = false;
-
   const apps = [
-    { id: 'photos', name: 'Photos', icon: photos },
-    { id: 'terminal', name: 'Terminal', icon: terminal },
-    { id: 'safari', name: 'Safari', icon: safari },
-    { id: 'projects', name: 'Projects', icon: projects },
-    { id: 'blog', name: 'Blog', icon: blog },
-    { id: 'github', name: 'Github', icon: github },
-    {id: 'clave', name:'Clave', icon: clave}
+    { name: 'Terminal', type: 'terminal', icon: terminalIcon },
+    { name: 'Safari', type: 'safari', icon: safariIcon },
+    { name: 'Photos', type: 'photos', icon: photosIcon },
+    { name: 'Projects', type: 'projects', icon: projectsIcon },
+    { 
+      name: 'GitHub', 
+      type: 'github', 
+      icon: githubIcon,
+      url: 'https://github.com/yassin549'
+    },
   ];
 
-  $: filteredApps = apps.filter(app => 
-    app.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  function handleAppClick(app: any) {
+    if (app.url) {
+      window.open(app.url, '_blank');
+    } else {
+      dispatch('launchApp', app.type);
+    }
+    dispatch('close');
+  }
 
-  function launchApp(appId: string) {
-  dispatch('launchApp', appId);
-  dispatch('closeLaunchpad');
-}
+  function handleClose(e: MouseEvent) {
+    if (e.target === e.currentTarget) {
+      dispatch('close');
+    }
+  }
 
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      dispatch('close');
+    }
+  }
 </script>
 
+<svelte:window on:keydown={handleKeydown} />
+
 {#if isOpen}
-  <div 
-    class="fixed inset-0 z-50 bg-black/30 backdrop-blur-2xl font-sf"
+  <div
+    class="fixed inset-0 bg-black/60 backdrop-blur-xl z-50"
+    on:click={handleClose}
     transition:fade={{ duration: 200 }}
-    on:click={() => dispatch('closeLaunchpad')}
   >
-    <div class="w-full h-full flex flex-col items-center pt-8">
+    <div 
+      class="absolute inset-0 grid place-items-center p-8"
+      on:click|stopPropagation
+    >
       <div 
-        class="w-64 h-8 bg-white/10 rounded-md flex items-center px-3 mb-8 transition-all duration-300 focus-within:bg-white/20 focus-within:ring-1 focus-within:ring-white/30"
-        on:click|stopPropagation
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 max-w-4xl mx-auto"
+        transition:scale={{ duration: 300, easing: quintOut }}
       >
-        <div class="flex items-center justify-center w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4 text-white/50 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search"
-            bind:value={searchText}
-            class="w-full bg-transparent text-white placeholder-white/50 outline-none font-light text-sm"
-          />
-        </div>
-      </div>
-      <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-x-8 gap-y-12 p-8 max-w-7xl mx-auto">
-        {#if filteredApps.length > 0}
-          {#each filteredApps as app}
+        {#each apps as app}
+          <button
+            class="flex flex-col items-center group focus:outline-none"
+            on:click={() => handleAppClick(app)}
+          >
             <div 
-              class="flex flex-col items-center cursor-pointer transition-all duration-200 hover:scale-110"
-              on:click|stopPropagation={() => launchApp(app.id)}
-              in:scale={{duration: 200, delay: 100}}
-              out:scale={{duration: 200}}
+              class="w-16 h-16 rounded-2xl bg-white/10 p-2 backdrop-blur-md
+                     group-hover:scale-110 group-hover:bg-white/20
+                     transition-all duration-200 ease-out"
             >
-              <img src={app.icon} alt={app.name} class="w-20 h-20 mb-2 object-contain" />
-              <span class="text-white text-sm text-center font-light">{app.name}</span>
+              <img 
+                src={app.icon} 
+                alt={app.name}
+                class="w-full h-full object-contain"
+                draggable="false"
+              />
             </div>
-          {/each}
-        {:else}
-          <div class="col-span-full text-center text-white/70 font-light text-xl">
-            No Results
-          </div>
-        {/if}
+            <span class="mt-2 text-white text-sm font-medium opacity-90
+                       group-hover:opacity-100 transition-opacity">
+              {app.name}
+            </span>
+          </button>
+        {/each}
       </div>
     </div>
   </div>
 {/if}
 
-
 <style>
-  .font-sf {
-    font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
+  button {
+    -webkit-tap-highlight-color: transparent;
   }
 </style>

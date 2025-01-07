@@ -1,29 +1,78 @@
 export interface Developer {
-  // name: string;
-  // role: string;
-  // company: string;
   about: string;
   code: string[];
   interests: string[];
   operatingSystems: string[];
   toolsUsed: string[];
   ides: string[];
+  contact: string;
 }
 
-export const ansxuman: Developer = {
-  // name: "Anshuman",
-  // role: "Product Engineer",
-  // company: "InstaSafe",
-  about: "Hey, I'm Anshuman, a Software Developer with a keen interest in building scalable \nand secure applications.Always eager to learn and experiment with new technologies.",
-  code: ["Golang", "Svelte", "Angular", "TS", "JS", "Java", "Swift", "Rust", "Python"],
-  interests: [
-    "Full-Stack Development",
-    "Cybersecurity",
-    "DevOps",
-    "Writing Blogs",
-    "Experimenting with New Technologies",
+export const yassin: Developer = {
+  about: `Hi, I'm Yassin! 👋
+
+I'm a passionate Software Developer with expertise in building scalable web applications 
+and AI-powered solutions. My journey in tech has led me to work on diverse projects, 
+from social media platforms to healthcare applications.
+
+Currently focusing on:
+- Full-stack web development with modern frameworks
+- AI/ML applications and integrations
+- Cloud-native architectures
+- Open source contributions
+
+Let's connect and build something amazing together!`,
+
+  code: [
+    "Python",
+    "JavaScript",
+    "TypeScript",
+    "Django",
+    "React",
+    "Node.js",
+    "Svelte",
+    "TailwindCSS",
+    "PostgreSQL",
+    "MongoDB"
   ],
-  operatingSystems: ["macOS 15 Sequoia", "Debian Bookworm", "Ubuntu"],
-  toolsUsed: ["Docker", "Git", "Parallels", "Termius", "Postman"],
-  ides: ["Cursor", "Zed", "VSCode", "Android Studio", "Xcode", "Neovim"],
+
+  interests: [
+    "🚀 Building scalable web applications",
+    "🤖 Artificial Intelligence & Machine Learning",
+    "☁️ Cloud Computing & DevOps",
+    "🔒 Cybersecurity",
+    "📱 Mobile App Development",
+    "🌐 Open Source Contribution"
+  ],
+
+  operatingSystems: [
+    "macOS",
+    "Ubuntu",
+    "Windows"
+  ],
+
+  toolsUsed: [
+    "Git",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "Firebase",
+    "Postman",
+    "Figma"
+  ],
+
+  ides: [
+    "VS Code",
+    "PyCharm",
+    "WebStorm",
+    "Android Studio",
+    "Xcode"
+  ],
+
+  contact: `
+📧 Email: yassin@example.com
+🌐 GitHub: github.com/yassin549
+💼 LinkedIn: linkedin.com/in/yassin
+🐦 Twitter: @yassin_dev
+`
 };

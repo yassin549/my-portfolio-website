@@ -4,7 +4,7 @@
   import { onMount } from "svelte";
   import { fade, slide } from 'svelte/transition';
   export let startDrag: (e: MouseEvent, id: string, action: 'move' | 'resize') => void;
-  export let windowInstance: wType;
+  export let window: wType;
 
   interface Photo {
     path: string;
@@ -69,7 +69,7 @@
       : photos.filter(photo => photo.album === currentAlbum);
 
   function openCloud() {
-    const url = 'https://www.pexels.com/@ansxuman/';
+    const url = 'https://www.pexels.com/@yassin/';
     if (typeof window !== 'undefined') {
       window.open(url, '_blank');
     }
@@ -78,11 +78,11 @@
 
 <div class="bg-white h-full rounded-lg flex flex-col shadow-lg overflow-hidden font-sans">
   <!-- Photos Header -->
-  <div class="bg-gray-100 px-4 py-2 flex items-center border-b border-gray-200" on:mousedown={(e) => windowInstance && startDrag(e, windowInstance.id, "move")}>
+  <div class="bg-gray-100 px-4 py-2 flex items-center border-b border-gray-200" on:mousedown={(e) => window && startDrag(e, window.id, "move")}>
     <div class="flex space-x-2">
-      <div class="w-3 h-3 rounded-full bg-red-500 cursor-pointer" on:click={() => windowInstance && closeWindow(windowInstance.id)}></div>
-      <div class="w-3 h-3 rounded-full bg-yellow-500 cursor-pointer" on:click={() => windowInstance && toggleMinimize(windowInstance.id)}></div>
-      <div class="w-3 h-3 rounded-full bg-green-500 cursor-pointer" on:click={() => windowInstance && toggleMaximize(windowInstance.id)}></div>
+      <div class="w-3 h-3 rounded-full bg-red-500 cursor-pointer" on:click={() => window && closeWindow(window.id)}></div>
+      <div class="w-3 h-3 rounded-full bg-yellow-500 cursor-pointer" on:click={() => window && toggleMinimize(window.id)}></div>
+      <div class="w-3 h-3 rounded-full bg-green-500 cursor-pointer" on:click={() => window && toggleMaximize(window.id)}></div>
     </div>
     <div class="flex-grow flex justify-center space-x-4">
       <button class="text-gray-600 hover:text-gray-800 transition-colors {currentView === 'Library' ? 'font-semibold' : ''}" on:click={() => changeView('Library')}>

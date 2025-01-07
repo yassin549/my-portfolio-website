@@ -1,32 +1,25 @@
-import { ansxuman } from "./devInfo";
-import { syncProjectsToFileSystem } from "./syncProjects";
+import { yassin } from "./devInfo";
 
-export const fileSystem: FileSystem = {
+export const fileSystem = {
   home: {
     about: `
-${ansxuman.about}
+${yassin.about}
 
 Programming Languages:
-${ansxuman.code.join(", ")}
+${yassin.code.join(", ")}
 
 Operating Systems:
-${ansxuman.operatingSystems.join(", ")}
+${yassin.operatingSystems.join(", ")}
 
 Tools Used:
-${ansxuman.toolsUsed.join(", ")}
+${yassin.toolsUsed.join(", ")}
 
 IDEs:
-${ansxuman.ides.join(", ")}
+${yassin.ides.join(", ")}
     `,
     projects: {},
     interests: `
-${ansxuman.interests.join("\n")}
+${yassin.interests.join("\n")}
     `,
   },
 };
-
-syncProjectsToFileSystem(fileSystem);
-
-export interface FileSystem {
-  [key: string]: string | FileSystem;
-}

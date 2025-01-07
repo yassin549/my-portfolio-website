@@ -1,27 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { ProjectData } from '../types/projectType';
-  import { projects } from '../stores/projectStore';
-  import { closeWindow, toggleMinimize, toggleMaximize } from "../stores/windowStore";
-  import type { wType } from "../types/wType";
+  import { fade } from 'svelte/transition';
   import SvelteMarkdown from 'svelte-markdown';
-  import CodeBlockWrapper from './CodeBlockWrapper.svelte';
-  import ProjectIcons from './ProjectIcons.svelte';
-  import { getTagColor, getTypeColor } from '../utils/tagColors';
-  import 'github-markdown-css/github-markdown-light.css';
-
-  export let startDrag: (e: MouseEvent, id: string, action: 'move' | 'resize') => void;
-  export let window: wType;
+  import { projects } from '$lib/stores/projectStore';
+  import type { ProjectData } from '$lib/types/projectType';
 
   let selectedProject: ProjectData | null = null;
-  let readmeContent: string = '';
-  let isLoading: boolean = false;
-
-  onMount(() => {
-    if ($projects.length > 0) {
-      selectProject($projects[0]);
-    }
-  });
+  let readmeContent = '';
+  let isLoading = false;
 
   async function selectProject(project: ProjectData) {
     selectedProject = project;
@@ -30,121 +16,167 @@
       const response = await fetch(project.readmeUrl);
       readmeContent = await response.text();
     } catch (error) {
-      console.error('Failed to fetch README:', error);
-      readmeContent = 'Failed to load README content.';
-    } finally {
-      isLoading = false;
+      console.error('Error loading README:', error);
+      readmeContent = 'Error loading README content.';
     }
+    isLoading = false;
   }
 
-  function openProjectLink(url: string) {
-    if (typeof globalThis !== 'undefined') {
-      globalThis.window.open(url, '_blank');
+  onMount(() => {
+    if ($projects && $projects.length > 0) {
+      selectProject($projects[0]);
     }
-  }
+  });
 
   const renderers = {
-    code: CodeBlockWrapper
+    image: (href, title, text) => {
+      return `<img src="${href}" alt="${text}" class="max-w-full rounded-lg shadow-lg my-4" />`;
+    }
   };
-
 </script>
 
-<div class="bg-white h-full rounded-lg flex flex-col overflow-hidden font-sans">
-  <!-- Projects Header -->
-  <div class="bg-gray-100 px-2 py-2 flex items-center cursor-move border-b border-gray-200" on:mousedown={(e) => startDrag(e, window.id, "move")}>
-    <div class="flex space-x-2 mr-4">
-      <button class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 focus:outline-none" on:click={() => closeWindow(window.id)}>
-        <svg class="w-3 h-3 text-red-800 opacity-0 hover:opacity-100" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <button class="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 focus:outline-none" on:click={() => toggleMinimize(window.id)}>
-        <svg class="w-3 h-3 text-yellow-800 opacity-0 hover:opacity-100" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path d="M20 12H4" />
-        </svg>
-      </button>
-      <button class="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 focus:outline-none" on:click={() => toggleMaximize(window.id)}>
-        <svg class="w-3 h-3 text-green-800 opacity-0 hover:opacity-100" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3" />
-        </svg>
-      </button>
-    </div>
-    <div class="flex-grow text-center font-semibold">Projects</div>
-  </div>
-
-  <div class="flex-grow flex overflow-hidden">
-    <div class="w-80 border-r border-gray-200 overflow-y-auto bg-gray-50">
-      {#each $projects as project,index}
-        <div 
-          class="p-4 hover:bg-gray-100 cursor-pointer transition-colors duration-200 {selectedProject === project ? 'bg-blue-100 border-l-2 border-blue-500' : ''}"
-          on:click={() => selectProject(project)}
-        >
-          <div class="flex items-center mb-2">
-            <div class="w-6 h-6 mr-2 text-gray-600">
-              <ProjectIcons iconName={project.icon} />
-            </div>
-            <h3 class="font-semibold flex-grow text-gray-800 truncate">{project.name}</h3>
-            <button 
-              class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-              on:click|stopPropagation={() => openProjectLink(project.githubUrl)}
-            >
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-              </svg>
-            </button>
+<div class="flex h-full bg-gray-900">
+  <!-- Project List -->
+  <div class="w-80 border-r border-white/10 overflow-y-auto bg-gray-900/80 backdrop-blur-xl">
+    {#each $projects as project}
+      <button
+        class="w-full text-left p-4 hover:bg-white/10 transition-colors {selectedProject?.id === project.id ? 'bg-white/20' : ''}"
+        on:click={() => selectProject(project)}
+      >
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 p-2 flex items-center justify-center">
+            <img
+              src="/icons/{project.icon}.svg"
+              alt="{project.name} icon"
+              class="w-8 h-8"
+            />
           </div>
-          <p class="text-sm text-gray-600 mb-2 line-clamp-2">{project.shortDescription}</p>
-          <div class="flex flex-wrap gap-1 mt-2">
-            <span class="px-2 py-1 text-xs font-medium rounded-full capitalize {getTypeColor(project.type)}">
-              {project.type}
-            </span>
-            {#each project.technologies as tech}
-              <span class="px-2 py-1 text-xs font-medium rounded-full {getTagColor(tech)}">
-                {tech}
-              </span>
-            {/each}
+          <div>
+            <h3 class="font-display text-white text-lg font-semibold">{project.name}</h3>
+            <p class="text-white/70 text-sm mt-0.5">{project.shortDescription}</p>
           </div>
         </div>
-        {#if index < $projects.length - 1}
-          <hr class="border-gray-300" />
-        {/if}
-      {/each}
-    </div>
+      </button>
+    {/each}
+  </div>
 
-    <div class="flex-1 overflow-hidden flex flex-col bg-white">
-      {#if selectedProject}
-        <div class="overflow-y-auto flex-grow">
+  <!-- Project Details -->
+  <div class="flex-1 overflow-y-auto p-8 bg-gray-900/90 backdrop-blur-xl">
+    {#if selectedProject}
+      <div class="max-w-3xl mx-auto">
+        <div class="flex items-start justify-between mb-8">
+          <div>
+            <h1 class="font-display text-white text-3xl font-bold mb-2">
+              {selectedProject.name}
+            </h1>
+            <p class="text-white/80 text-lg max-w-2xl">
+              {selectedProject.shortDescription}
+            </p>
+          </div>
+          <a
+            href={selectedProject.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors text-white font-medium"
+          >
+            View on GitHub
+            <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="space-y-8">
+          <!-- Technologies -->
+          <div>
+            <h2 class="font-display text-white text-2xl font-semibold mb-4">Technologies</h2>
+            <div class="flex flex-wrap gap-2">
+              {#each selectedProject.technologies as tech}
+                <span class="px-4 py-2 bg-white/10 rounded-lg text-white/90 font-medium">
+                  {tech}
+                </span>
+              {/each}
+            </div>
+          </div>
+
+          <!-- README Content -->
           {#if isLoading}
-            <div class="flex justify-center items-center h-64">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <div class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-white/20 border-t-white"></div>
             </div>
           {:else}
-            <div class="markdown-body prose prose-sm max-w-none">
-              <SvelteMarkdown source={readmeContent} {renderers} />
+            <div class="prose-apple">
+              <h2 class="font-display text-white text-2xl font-semibold mb-4">README</h2>
+              <div class="bg-white/5 rounded-xl p-6 text-white/90">
+                <SvelteMarkdown source={readmeContent} renderers={renderers} />
+              </div>
             </div>
           {/if}
         </div>
-      {:else}
-        <div class="p-6 flex items-center justify-center h-full">
-          <p class="text-gray-600 text-center">Select a project to view details</p>
-        </div>
-      {/if}
-    </div>
+      </div>
+    {:else}
+      <div class="h-full flex items-center justify-center text-white/60 text-lg">
+        Select a project to view details
+      </div>
+    {/if}
   </div>
 </div>
 
 <style>
-  :global(.markdown-body) {
-    box-sizing: border-box;
-    min-width: 200px;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 45px;
+  :global(.prose-apple) {
+    color: rgba(255, 255, 255, 0.9);
   }
 
-  @media (max-width: 767px) {
-    :global(.markdown-body) {
-      padding: 15px;
-    }
+  :global(.prose-apple h1) {
+    @apply font-display text-white text-3xl font-bold mt-8 mb-4;
+  }
+
+  :global(.prose-apple h2) {
+    @apply font-display text-white text-2xl font-semibold mt-6 mb-3;
+  }
+
+  :global(.prose-apple h3) {
+    @apply font-display text-white text-xl font-semibold mt-5 mb-2;
+  }
+
+  :global(.prose-apple p) {
+    @apply text-white/90 text-lg mb-4 leading-relaxed;
+  }
+
+  :global(.prose-apple ul) {
+    @apply text-white/90 text-lg mb-4 list-disc pl-5 space-y-2;
+  }
+
+  :global(.prose-apple li) {
+    @apply mb-2;
+  }
+
+  :global(.prose-apple code) {
+    @apply text-sm bg-white/10 px-1.5 py-0.5 rounded font-mono text-white/90;
+  }
+
+  :global(.prose-apple pre) {
+    @apply bg-black/20 p-4 rounded-lg mb-4 overflow-x-auto;
+  }
+
+  :global(.prose-apple pre code) {
+    @apply bg-transparent p-0 text-white/90;
+  }
+
+  :global(.prose-apple a) {
+    @apply text-blue-400 hover:text-blue-300 transition-colors;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-black/10;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
   }
 </style>

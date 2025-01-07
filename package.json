@@ -26,6 +26,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"dependencies": "^0.0.1",
 		"github-markdown-css": "^5.7.0",
 		"prismjs": "^1.29.0",
 		"svelte-markdown": "^0.4.1"
