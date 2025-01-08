@@ -5,6 +5,21 @@ export const windows = writable<wType[]>([]);
 
 let nextZIndex = 1;
 
+// Function to generate UUID
+function generateUUID() {
+  // Check if crypto.randomUUID is available
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback implementation
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 // Window configurations for different types
 const windowConfigs = {
   terminal: {
@@ -62,7 +77,7 @@ function calculatePosition(type: keyof typeof windowConfigs) {
 }
 
 export function addWindow(type: 'terminal' | 'safari' | 'photos' | 'projects') {
-  const id = crypto.randomUUID();
+  const id = generateUUID();
   const config = windowConfigs[type];
   const position = calculatePosition(type);
 
