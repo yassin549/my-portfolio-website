@@ -75,20 +75,12 @@ const Terminal = create_ssr_component(($$result, $$props, $$bindings, slots) => 
 });
 const windows = writable([]);
 let nextZIndex = 1;
+let counter = 0;
 function generateUUID() {
-  let d = (/* @__PURE__ */ new Date()).getTime();
-  let d2 = typeof performance !== "undefined" && performance.now && performance.now() * 1e3 || 0;
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-    let r = Math.random() * 16;
-    if (d > 0) {
-      r = (d + r) % 16 | 0;
-      d = Math.floor(d / 16);
-    } else {
-      r = (d2 + r) % 16 | 0;
-      d2 = Math.floor(d2 / 16);
-    }
-    return (c === "x" ? r : r & 3 | 8).toString(16);
-  });
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 15);
+  const counterStr = (counter++ % 1e3).toString(36).padStart(3, "0");
+  return `${timestamp}-${randomStr}-${counterStr}`;
 }
 const windowConfigs = {
   terminal: {

@@ -4,22 +4,14 @@ import type { wType } from '../types/wType';
 export const windows = writable<wType[]>([]);
 
 let nextZIndex = 1;
+let counter = 0;
 
 // Function to generate UUID
 function generateUUID() {
-  let d = new Date().getTime();
-  let d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    let r = Math.random() * 16;
-    if (d > 0) {
-      r = (d + r) % 16 | 0;
-      d = Math.floor(d / 16);
-    } else {
-      r = (d2 + r) % 16 | 0;
-      d2 = Math.floor(d2 / 16);
-    }
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 15);
+  const counterStr = (counter++ % 1000).toString(36).padStart(3, '0');
+  return `${timestamp}-${randomStr}-${counterStr}`;
 }
 
 // Window configurations for different types
