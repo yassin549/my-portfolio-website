@@ -71,7 +71,9 @@ function calculatePosition(type: keyof typeof windowConfigs) {
 }
 
 export function addWindow(type: 'terminal' | 'safari' | 'photos' | 'projects') {
+  console.log('Adding window of type:', type);
   const id = generateUUID();
+  console.log('Generated UUID:', id);
   const config = windowConfigs[type];
   const position = calculatePosition(type);
 
@@ -92,7 +94,9 @@ export function addWindow(type: 'terminal' | 'safari' | 'photos' | 'projects') {
     }
   };
 
+  console.log('Created new window:', newWindow);
   windows.update(w => [...w, newWindow]);
+  console.log('Updated windows store');
   return id;
 }
 
